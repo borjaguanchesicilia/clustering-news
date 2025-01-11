@@ -1,5 +1,6 @@
 import os
 import re
+from collections import defaultdict
 
 REGEX_PATH_FILE = "./data/headers.txt"
 
@@ -70,3 +71,32 @@ def process_file(input_file, output_file, header_regex):
             elif not (header_detected and re.compile(r"^[ \t]").match(line)):
                 header_detected = False
                 outfile.write(line)
+
+
+def load_news(base_directory):
+    """
+    Carga las noticias desde un directorio base organizado por subdirectorios, 
+    donde cada subdirectorio representa un tema de noticias. Cada archivo dentro 
+    de los subdirectorios se asocia a un identificador de noticia (basado en el 
+    nombre del archivo) y se organiza en un diccionario cuyo valor es una lista 
+    de identificadores de noticia para cada tema.
+
+    Args:
+        base_directory (str): Ruta del directorio base donde se encuentran los 
+                               subdirectorios de noticias organizados por tema.
+
+    Returns:
+        defaultdict(list): Un diccionario donde las claves son los nombres de 
+                           los temas y los valores son listas con los
+                           identificadores de noticia.
+    """
+    news_goldstandard = defaultdict(list)
+    
+    for topic in os.listdir(base_directory):
+        topic_path = os.path.join(base_directory, topic)
+        if os.path.isdir(topic_path):
+            topic_files = os.listdir(topic_path)
+            for file in topic_files:
+                news_goldstandard[topic].append(int(file))
+    
+    return news_goldstandard
